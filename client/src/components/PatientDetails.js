@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 
 const PatientDetails = () => {
-  const [patient, setPatient] = useState(null); // Set initial state to null
+  const [patient, setPatient] = useState(null); 
   const [error, setError] = useState('');
   const { user } = useAuth();
 
@@ -15,7 +15,7 @@ const PatientDetails = () => {
           }
           return response.json();
         })
-        .then((data) =>{console.log('Fetched patient data:', data); // Add this line to inspect the fetched data
+        .then((data) =>{console.log('Fetched patient data:', data); 
            setPatient(data)
           })
         .catch((error) => {
@@ -29,7 +29,6 @@ const PatientDetails = () => {
     return <p>Error: {error}</p>;
   }
 
-  // Display a loading message or a placeholder if patient data is null
   if (!patient) {
     return <p>Loading patient details...</p>;
   }

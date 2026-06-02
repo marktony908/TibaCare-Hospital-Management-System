@@ -1,0 +1,16 @@
+# Server-specific ignores
+instance/
+*.db
+*.sqlite
+__pycache__/
+*.pyc
+.env
+.env.local
+*.egg-info/
+.coverage
+.pytest_cache/
+.mypy_cache/
+*.swp
+*.swo
+*~
+.DS_Store

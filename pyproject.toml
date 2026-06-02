@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tibacare-hospital-management"
+version = "0.1.0"
+description = "TibaCare Hospital Management System - Full-stack hospital management system with role-based authentication"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "TibaCare Team", email = "support@tibacare.com"}
+]
+
+dependencies = [
+    "Flask==3.0.0",
+    "Flask-CORS==4.0.0",
+    "Flask-SQLAlchemy==3.1.1",
+    "Flask-Migrate==4.0.5",
+    "Flask-RESTful==0.3.10",
+    "Flask-Bcrypt==1.0.1",
+    "SQLAlchemy==2.0.23",
+    "sqlalchemy-serializer==1.4.1",
+    "Faker==22.0.0",
+    "python-dotenv==1.0.0",
+    "Werkzeug==3.0.1"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "isort>=5.12.0"
+]
+
+[tool.setuptools]
+packages = ["server"]
+
+[tool.black]
+line-length = 100
+target-version = ['py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | migrations
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_mode = 3
+include_trailing_comma = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=server --cov-report=html"
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"

@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "buildCommand": "cd server && pip install -r requirements.txt",
+  "env": {
+    "PYTHONUNBUFFERED": "1",
+    "ENVIRONMENT": "production"
+  },
+  "functions": {
+    "server/app.py": {
+      "runtime": "python3.12"
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "server/app.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "server/app.py"
+    }
+  ]
+}

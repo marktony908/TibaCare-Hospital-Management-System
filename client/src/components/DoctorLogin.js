@@ -3,17 +3,17 @@ import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from 'yup';
 import Navbar from "./Navbar";
-import { useAuth } from './AuthContext'; // Import useAuth
+import { useAuth } from './AuthContext'; 
 
 function DoctorLogin() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
-    const { setUser } = useAuth(); // Use context
+    const { setUser } = useAuth(); 
 
     const loginSchema = yup.object().shape({
         email: yup.string().email("Invalid email format").required('Email is required'),
-        password: yup.string().required('Password is required') // Corrected error message
+        password: yup.string().required('Password is required') 
     });
 
     const formik = useFormik({

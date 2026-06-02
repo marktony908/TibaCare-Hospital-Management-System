@@ -8,22 +8,36 @@ from sqlalchemy.orm import joinedload
 from models import db, Doctor, Department, Patient, Appointment
 from werkzeug.utils import secure_filename
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
+# Configuration with environment variables
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images')
-app.config['SECRET_KEY'] = os.urandom(24)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+SECRET_KEY = os.getenv('SECRET_KEY', 'dev-key-change-in-production')
+DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///app.db')
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
+ALLOWED_ORIGINS = os.getenv('ALLOWED_ORIGINS', 'http://localhost:4000')
+
+app.config['SECRET_KEY'] = SECRET_KEY
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['SESSION_COOKIE_SECURE'] = True
+# Only set SECURE cookie in production
+app.config['SESSION_COOKIE_SECURE'] = ENVIRONMENT == 'production'
 app.json.compact = False
 
 migrate = Migrate(app, db)
 api = Api(app)
 bcrypt = Bcrypt(app)
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:4000"}})
+
+# Parse CORS origins from environment variable
+cors_origins = [origin.strip() for origin in ALLOWED_ORIGINS.split(',')]
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": cors_origins}})
 
 db.init_app(app)
 
@@ -75,12 +89,12 @@ class DoctorSignup(Resource):
         data = request.form
         image = request.files.get('image')
         
+        # Store only filename, not full path
+        filename = None
         if image:
             filename = secure_filename(image.filename)
             image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             image.save(image_path)
-        else:
-            image_path = None
             
         new_doctor = Doctor(
             title=data.get('title'),
@@ -92,7 +106,7 @@ class DoctorSignup(Resource):
             education=data.get('education'),
             certifications=data.get('certifications'),
             specialty=data.get('specialty'),
-            image=image_path,
+            image=filename,  # Store only filename
             department_id=data.get('department'),
             password=bcrypt.generate_password_hash(data.get('password')).decode('utf-8')
         )
@@ -201,7 +215,7 @@ class PatientById(Resource):
         patient = Patient.query.filter_by(id=id).first()
         return make_response(patient.to_dict(),200)
         
-class Appointment(Resource):
+class AppointmentResource(Resource):
     def get(self, appointment_id=None):
         # If appointment_id is provided, fetch a single appointment
         if appointment_id:
@@ -231,7 +245,7 @@ api.add_resource(PatientSignup, '/api/patientsignup', endpoint='patientsignup')
 api.add_resource(PatientLogin, '/api/patientlogin', endpoint='patientlogin')
 api.add_resource(DoctorById, '/api/doctor/<int:id>')
 api.add_resource(PatientById, '/api/patient/<int:id>')
-api.add_resource(Appointment, '/api/appointments', '/api/appointments/<int:appointment_id>')
+api.add_resource(AppointmentResource, '/api/appointments', '/api/appointments/<int:appointment_id>')
 api.add_resource(DepartmentList, '/api/departments', endpoint='departments')
 api.add_resource(DoctorsByDepartment, '/api/departments/<int:id>')
 api.add_resource(DoctorProfile, '/api/doctors/<int:id>')

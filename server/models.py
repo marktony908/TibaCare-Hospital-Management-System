@@ -150,8 +150,6 @@ class Doctor(db.Model, sm):
             "specialty": self.specialty,
             "image": self.image,
             "department_id": self.department_id,
-            "years_of_experience": self.years_of_experience,  # Include years of experience
-            "achievements": self.achievements,  # Include achievements
         }
 
     def __repr__(self):
